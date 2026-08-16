@@ -3,9 +3,6 @@ name: Build and push image
 on:
   push:
     branches: [main]
-    paths:
-      - "app/**"
-      - ".github/workflows/docker.yml"
   workflow_dispatch:
 
 jobs:
