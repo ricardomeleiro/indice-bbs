@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Não encontrado{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="display-6">Página não encontrada</h1>
+  <a class="btn btn-outline-primary" href="{{ request.url_for('dashboard_view') }}">Voltar</a>
+</div>
+{% endblock %}

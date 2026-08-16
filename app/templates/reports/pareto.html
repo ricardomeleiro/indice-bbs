@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Pareto de falhas – Índice BBS{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Pareto de falhas por critério</h4>
+    <div class="text-muted small">
+      Ano {{ year }}{% if month %} · {{ MONTH_FULL_PT[month-1] }}{% endif %}
+      · Total de falhas: {{ total }}
+    </div>
+  </div>
+  <form class="filter-bar mb-0 d-flex gap-2" method="get">
+    <select class="form-select form-select-sm" name="ano">
+      {% for y in years %}<option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>{% endfor %}
+    </select>
+    <select class="form-select form-select-sm" name="mes">
+      <option value="">Ano todo</option>
+      {% for i in range(1,13) %}
+      <option value="{{ i }}" {% if month == i %}selected{% endif %}>{{ MONTH_FULL_PT[i-1] }}</option>
+      {% endfor %}
+    </select>
+    <select class="form-select form-select-sm" name="vessel_id">
+      <option value="">Todas embarcações</option>
+      {% for v in vessels %}
+      <option value="{{ v.id }}" {% if vessel_id == v.id %}selected{% endif %}>{{ v.name }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-sm btn-primary">Aplicar</button>
+  </form>
+</div>
+
+<div class="card p-3">
+  <div class="chart-box"><canvas id="pareto"></canvas></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const rows = {{ rows | tojson }};
+  const labels = rows.map(r => r.label);
+  const values = rows.map(r => r.value);
+  const cum    = rows.map(r => r.cum_pct * 100);
+
+  new Chart(document.getElementById('pareto'), {
+    data: {
+      labels,
+      datasets: [
+        { type: 'bar', label: 'Ocorrências', data: values,
+          backgroundColor: '#0d6efd', yAxisID: 'y', borderRadius: 4, order: 2 },
+        { type: 'line', label: '% cumulativo', data: cum,
+          borderColor: '#dc3545', backgroundColor: '#dc3545',
+          yAxisID: 'y1', tension: 0.2, borderWidth: 2, order: 1 },
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: {
+        y:  { beginAtZero: true, position: 'left', title: { display: true, text: 'Ocorrências' } },
+        y1: { beginAtZero: true, max: 100, position: 'right', grid: { drawOnChartArea: false },
+              ticks: { callback: v => v + '%' }, title: { display: true, text: '% cumulativo' } },
+      },
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+{% endblock %}

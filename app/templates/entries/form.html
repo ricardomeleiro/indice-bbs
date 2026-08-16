@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{% if entry %}Editar{% else %}Novo{% endif %} lançamento – Índice BBS{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{% if entry %}Editar lançamento{% else %}Novo lançamento mensal{% endif %}</h4>
+  <a class="btn btn-sm btn-outline-secondary" href="{{ request.url_for('entries_list') }}">Voltar</a>
+</div>
+
+<form method="post"
+      action="{% if entry %}{{ request.url_for('entries_update', entry_id=entry.id) }}{% else %}{{ request.url_for('entries_create') }}{% endif %}"
+      class="card p-4">
+
+  <div class="row g-3">
+    <div class="col-md-2">
+      <label class="form-label">Ano</label>
+      <input type="number" name="year" min="2020" max="2099" required class="form-control"
+             value="{{ default_year }}">
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Mês</label>
+      <select name="month" class="form-select" required>
+        {% for i in range(1, 13) %}
+        <option value="{{ i }}" {% if i == default_month %}selected{% endif %}>
+          {{ "%02d"|format(i) }} — {{ MONTH_FULL_PT[i-1] }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-7">
+      <label class="form-label">ROV</label>
+      <select name="rov_id" class="form-select" required>
+        {% for r in rovs %}
+        <option value="{{ r.id }}" {% if r.id == default_rov_id %}selected{% endif %}>
+          {{ r.rov_id }} — {{ r.vessel.name }} ({{ r.kind.value }}) · {{ r.vessel.contractor }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row g-3">
+    <div class="col-md-3">
+      <label class="form-label">Total BBS no mês</label>
+      <input type="number" name="total_bbs" min="0" required class="form-control"
+             value="{{ entry.total_bbs if entry else 0 }}">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Não conformes (≥1 inconsistência)</label>
+      <input type="number" name="non_conforming" min="0" required class="form-control"
+             value="{{ entry.non_conforming if entry else 0 }}">
+      <div class="form-text">Deve ser ≤ Total BBS.</div>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Observações / link do relatório</label>
+      <input type="text" name="observations" maxlength="500" class="form-control"
+             value="{{ entry.observations if entry and entry.observations else '' }}"
+             placeholder="Ex.: Atualizado 20/05/2026">
+    </div>
+  </div>
+
+  <hr>
+  <h6 class="text-muted">Falhas por critério (Pareto)</h6>
+  <div class="row g-3">
+    <div class="col">
+      <label class="form-label small">C1 – Nome/Função</label>
+      <input type="number" name="c1" min="0" class="form-control" value="{{ entry.c1 if entry else 0 }}">
+    </div>
+    <div class="col">
+      <label class="form-label small">C2 – Classificação incoerente</label>
+      <input type="number" name="c2" min="0" class="form-control" value="{{ entry.c2 if entry else 0 }}">
+    </div>
+    <div class="col">
+      <label class="form-label small">C3 – Dano potencial</label>
+      <input type="number" name="c3" min="0" class="form-control" value="{{ entry.c3 if entry else 0 }}">
+    </div>
+    <div class="col">
+      <label class="form-label small">C4 – CRM</label>
+      <input type="number" name="c4_crm" min="0" class="form-control" value="{{ entry.c4_crm if entry else 0 }}">
+    </div>
+    <div class="col">
+      <label class="form-label small">C4 – Elo</label>
+      <input type="number" name="c4_elo" min="0" class="form-control" value="{{ entry.c4_elo if entry else 0 }}">
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-end gap-2">
+    <a class="btn btn-outline-secondary" href="{{ request.url_for('entries_list') }}">Cancelar</a>
+    <button class="btn btn-primary">
+      <i class="bi bi-save me-1"></i>{% if entry %}Salvar alterações{% else %}Criar lançamento{% endif %}
+    </button>
+  </div>
+</form>
+{% endblock %}

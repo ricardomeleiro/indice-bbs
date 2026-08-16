@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Evolução mensal – Índice BBS{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Evolução mensal do KPI</h4>
+    <div class="text-muted small">Ano {{ year }} · linha por embarcação</div>
+  </div>
+  <form class="filter-bar mb-0 d-flex gap-2" method="get">
+    <select class="form-select form-select-sm" name="ano">
+      {% for y in years %}<option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-sm btn-primary">Aplicar</button>
+  </form>
+</div>
+
+<div class="card p-3 mb-3">
+  <div class="card-header px-0 d-flex justify-content-between">
+    <span>KPI% mensal por embarcação</span>
+    <div>
+      <button class="btn btn-sm btn-outline-secondary" id="btnAll">Todas</button>
+      <button class="btn btn-sm btn-outline-secondary" id="btnNone">Nenhuma</button>
+    </div>
+  </div>
+  <div class="chart-box tall"><canvas id="evolChart"></canvas></div>
+</div>
+
+<div class="card p-3">
+  <div class="card-header px-0">Tendência consolidada da frota</div>
+  <div class="chart-box"><canvas id="fleetChart"></canvas></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const series = {{ series | tojson }};
+  const fleet  = {{ fleet | tojson }};
+  const months = {{ MONTH_LABELS_PT | tojson }};
+
+  const palette = [
+    '#0d6efd','#198754','#dc3545','#fd7e14','#6f42c1','#20c997',
+    '#0dcaf0','#ffc107','#d63384','#6610f2','#495057','#212529',
+    '#e83e8c','#17a2b8','#28a745','#dc3545','#ff8c00','#8a2be2',
+    '#008080','#b8860b','#5f9ea0','#a52a2a'
+  ];
+
+  const vessels = Object.keys(series).sort();
+  const datasets = vessels.map((v, i) => ({
+    label: v,
+    data: series[v].map(x => x === null ? null : x * 100),
+    borderColor: palette[i % palette.length],
+    backgroundColor: palette[i % palette.length],
+    borderWidth: 2, tension: 0.3, spanGaps: true, pointRadius: 3,
+  }));
+
+  const evolChart = new Chart(document.getElementById('evolChart'), {
+    type: 'line',
+    data: { labels: months, datasets },
+    options: {
+      maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } },
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12 } },
+        tooltip: { callbacks: { label: c => c.dataset.label + ': ' + (c.raw === null ? 'sem dados' : c.raw.toFixed(1) + '%') } },
+      }
+    }
+  });
+
+  document.getElementById('btnAll').onclick = () => {
+    evolChart.data.datasets.forEach((_, i) => evolChart.setDatasetVisibility(i, true));
+    evolChart.update();
+  };
+  document.getElementById('btnNone').onclick = () => {
+    evolChart.data.datasets.forEach((_, i) => evolChart.setDatasetVisibility(i, false));
+    evolChart.update();
+  };
+
+  new Chart(document.getElementById('fleetChart'), {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'KPI% frota', data: fleet.map(x => x === null ? null : x * 100),
+        borderColor: '#003057', backgroundColor: 'rgba(0,48,87,.15)',
+        borderWidth: 3, tension: 0.3, fill: true, spanGaps: true,
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+</script>
+{% endblock %}

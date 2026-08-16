@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Admin: Auditoria – Índice BBS{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Auditoria</h4>
+  <form class="filter-bar mb-0 d-flex gap-2" method="get">
+    <input type="number" class="form-control form-control-sm" name="limit" min="10" max="1000"
+           value="{{ limit }}" style="width: 100px;">
+    <button class="btn btn-sm btn-primary">Aplicar</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-vessel mb-0">
+      <thead class="table-light">
+        <tr><th>Quando</th><th>Usuário</th><th>Ação</th><th>Entidade</th><th>Detalhes</th><th>IP</th></tr>
+      </thead>
+      <tbody>
+        {% for l in logs %}
+        <tr>
+          <td class="small">{{ l.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+          <td>{{ users_by_id[l.user_id].name if l.user_id in users_by_id else "—" }}</td>
+          <td><code>{{ l.action }}</code></td>
+          <td class="small">{{ l.entity_type }} #{{ l.entity_id or "" }}</td>
+          <td class="small text-truncate" style="max-width: 400px;">{{ l.details or "" }}</td>
+          <td class="small">{{ l.ip_address or "" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Sem eventos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

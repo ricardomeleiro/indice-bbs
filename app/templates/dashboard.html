@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – Índice BBS{% endblock %}
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="mb-0">Dashboard executivo</h4>
+    <div class="text-muted small">{{ month_label }} / {{ year }} · KPI = Conformes ÷ Total BBS</div>
+  </div>
+  <form class="d-flex gap-2 filter-bar mb-0" method="get">
+    <select class="form-select form-select-sm" name="ano">
+      {% for y in years %}
+      <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+    <select class="form-select form-select-sm" name="mes">
+      {% for i in range(1, 13) %}
+      <option value="{{ i }}" {% if i == month %}selected{% endif %}>{{ MONTH_FULL_PT[i-1] }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-sm btn-primary">Aplicar</button>
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="card stat-card p-3">
+      <div class="stat-label">Total BBS (frota)</div>
+      <div class="stat-value">{{ total_bbs }}</div>
+      <div class="stat-hint">Conformes: {{ total_conforming }} · Não conformes: {{ total_non_conforming }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card p-3">
+      <div class="stat-label">KPI% consolidado</div>
+      <div class="stat-value {% if fleet_kpi and fleet_kpi >= 0.87 %}kpi-ok{% elif fleet_kpi and fleet_kpi >= 0.80 %}kpi-warn{% else %}kpi-bad{% endif %}">
+        {% if fleet_kpi is not none %}{{ "%.1f"|format(fleet_kpi*100) }}%{% else %}—{% endif %}
+      </div>
+      <div class="stat-hint">Frota inteira no mês</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card p-3">
+      <div class="stat-label">Embarcações na meta</div>
+      <div class="stat-value">{{ hit_target }}/{{ tracked }}</div>
+      <div class="stat-hint">Com KPI ≥ meta de maturidade</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card p-3">
+      <div class="stat-label">Metas por maturidade</div>
+      <div class="d-flex gap-2 flex-wrap mt-1">
+        <span class="badge bg-secondary">Inicial {{ (meta_map['INICIAL']*100)|int }}%</span>
+        <span class="badge bg-info text-dark">Estável {{ (meta_map['ESTAVEL']*100)|int }}%</span>
+        <span class="badge bg-success">Maduro {{ (meta_map['MADURO']*100)|int }}%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <div class="card-header px-0">KPI% por embarcação</div>
+      <div class="chart-box"><canvas id="kpiBar"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <div class="card-header px-0">Conformidade da frota</div>
+      <div class="chart-box short"><canvas id="donut"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span>Detalhamento por embarcação</span>
+    <a class="btn btn-sm btn-outline-secondary"
+       href="{{ request.url_for('export_entries_csv') }}?ano={{ year }}&mes={{ month }}">
+      <i class="bi bi-download me-1"></i>CSV
+    </a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover table-vessel mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Embarcação</th>
+          <th>Contratante</th>
+          <th>Maturidade</th>
+          <th class="num">Meta</th>
+          <th class="num">Total BBS</th>
+          <th class="num">Conformes</th>
+          <th class="num">Não conf.</th>
+          <th class="num">KPI %</th>
+          <th class="text-center">Meta?</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+        <tr>
+          <td class="fw-semibold">{{ r.vessel_name }}</td>
+          <td>{{ r.contractor }}</td>
+          <td>{{ r.maturity.value|title }}</td>
+          <td class="num">{{ "%.0f"|format(r.target*100) }}%</td>
+          <td class="num">{{ r.total_bbs }}</td>
+          <td class="num">{{ r.conforming }}</td>
+          <td class="num">{{ r.non_conforming }}</td>
+          <td class="num">
+            {% if r.kpi_pct is not none %}
+              <strong class="{% if r.status == 'yes' %}kpi-ok{% else %}kpi-bad{% endif %}">
+                {{ "%.1f"|format(r.kpi_pct*100) }}%
+              </strong>
+            {% else %}<span class="text-muted">—</span>{% endif %}
+          </td>
+          <td class="text-center">
+            {% if r.status == 'yes' %}<span class="badge badge-status-yes">SIM</span>
+            {% elif r.status == 'no' %}<span class="badge badge-status-no">NÃO</span>
+            {% else %}<span class="badge badge-status-na">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const rows = {{ rows | tojson }};
+  const labels = rows.map(r => r.vessel_name);
+  const kpi   = rows.map(r => r.kpi_pct === null ? null : r.kpi_pct * 100);
+  const targ  = rows.map(r => r.target * 100);
+  const cols  = rows.map(r => {
+      if (r.kpi_pct === null) return '#dee2e6';
+      return r.status === 'yes' ? '#198754' : '#dc3545';
+  });
+
+  new Chart(document.getElementById('kpiBar'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'KPI %', data: kpi, backgroundColor: cols, borderRadius: 4, order: 2 },
+        { label: 'Meta', data: targ, type: 'line', borderColor: '#0d6efd', borderDash: [5,4],
+          pointRadius: 0, borderWidth: 2, fill: false, order: 1 },
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } } },
+      plugins: {
+        tooltip: { callbacks: {
+          label: c => c.dataset.label + ': ' + (c.raw === null ? 'sem dados' : c.raw.toFixed(1) + '%')
+        }},
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  const totalConf = {{ total_conforming }};
+  const totalNC   = {{ total_non_conforming }};
+  new Chart(document.getElementById('donut'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Conformes', 'Não conformes'],
+      datasets: [{ data: [totalConf, totalNC], backgroundColor: ['#198754', '#dc3545'] }]
+    },
+    options: {
+      maintainAspectRatio: false, cutout: '65%',
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+</script>
+{% endblock %}

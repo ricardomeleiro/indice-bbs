@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.DS_Store
+*.log
+
+# Do not commit real data
+*.xlsx
+*.xls
