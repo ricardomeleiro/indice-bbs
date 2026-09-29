@@ -1,16 +1,17 @@
+version: "3.8"
+
 services:
   db:
     image: postgres:16-alpine
     container_name: indicebbs_db
-    env_file: .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: indicebbs
+      POSTGRES_USER: indicebbs
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-indicebbs_pass_2026}
     volumes:
       - indicebbs_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U indicebbs -d indicebbs"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,14 +20,27 @@ services:
   app:
     image: rickdevs/indice-bbs:latest
     container_name: indicebbs_app
-    env_file: .env
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://indicebbs:${POSTGRES_PASSWORD:-indicebbs_pass_2026}@db:5432/indicebbs
+      BASE_URL: https://hub.c-innovation.com.br/bbs
+      ROOT_PATH: /bbs
+      SECRET_KEY: ${SECRET_KEY:-chave_secreta_longa_bbs_c_innovation}
+      TZ: America/Sao_Paulo
+      
+      # SSO Authentik
+      AUTHENTIK_HEADER_EMAIL: x-authentik-email
+      AUTHENTIK_HEADER_USERNAME: x-authentik-username
+      AUTHENTIK_HEADER_NAME: x-authentik-name
+      AUTHENTIK_HEADER_GROUPS: x-authentik-groups
+      BBS_ADMIN_GROUP: bbs-admin
+      BBS_EDITOR_GROUP: bbs-editor
+      
+      # Produção
+      DEV_MODE: 0
     depends_on:
       db:
         condition: service_healthy
     ports:
-      # Bound to loopback only — Apache on the host proxies /bbs to this port
       - "127.0.0.1:18010:8000"
     restart: unless-stopped
 
