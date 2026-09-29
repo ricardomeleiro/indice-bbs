@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentação Técnica — Índice BBS por Embarcação</title>
+  <meta name="description" content="Documentação técnica, arquitetural e operacional da aplicação Índice BBS por Embarcação da C-Innovation.">
+  
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #0b1120;
+      --bg-secondary: #131d33;
+      --bg-tertiary: #1e293b;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-color: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-primary: #38bdf8;
+      --accent-secondary: #0284c7;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #6366f1;
+      --code-bg: #0f172a;
+      --sidebar-width: 290px;
+      --header-height: 70px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -4px rgba(0,0,0,0.4);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent-primary: #0284c7;
+      --accent-secondary: #0369a1;
+      --accent-glow: rgba(2, 132, 199, 0.15);
+      --code-bg: #1e293b;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.65;
+      font-size: 15px;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-primary);
+    }
+
+    /* Top Navigation Header */
+    .top-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: rgba(19, 29, 51, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    [data-theme="light"] .top-header {
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .brand-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: white;
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-box input {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 14px 8px 36px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      width: 220px;
+      transition: all 0.3s ease;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      width: 280px;
+    }
+    .search-box i {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .btn-icon {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-icon:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      transform: translateY(-1px);
+    }
+
+    /* Layout */
+    .doc-layout {
+      display: flex;
+      margin-top: var(--header-height);
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* Sidebar Navigation */
+    .doc-sidebar {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      padding: 1.5rem 1rem 3rem 1.25rem;
+      z-index: 900;
+    }
+
+    .sidebar-category {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 1.5rem 0 0.5rem 0.5rem;
+    }
+    .sidebar-category:first-of-type {
+      margin-top: 0.2rem;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+    .sidebar-item {
+      margin-bottom: 2px;
+    }
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .sidebar-link:hover {
+      color: var(--accent-primary);
+      background: var(--bg-tertiary);
+      transform: translateX(3px);
+    }
+    .sidebar-link.active {
+      color: var(--accent-primary);
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      border-left: 3px solid var(--accent-primary);
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .sidebar-link i {
+      font-size: 0.95rem;
+      width: 18px;
+      text-align: center;
+    }
+
+    /* Main Content Area */
+    .doc-main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 3rem 4rem 6rem;
+      max-width: 1200px;
+    }
+
+    @media (max-width: 1024px) {
+      .doc-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      .doc-sidebar.open {
+        transform: translateX(0);
+      }
+      .doc-main {
+        margin-left: 0;
+        padding: 2rem 1.5rem;
+      }
+      .mobile-menu-btn {
+        display: flex !important;
+      }
+    }
+
+    .mobile-menu-btn {
+      display: none;
+    }
+
+    /* Typography & Sections */
+    h1, h2, h3, h4, h5 {
+      color: var(--text-primary);
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    
+    .hero-section {
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 3rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent-primary);
+      border-radius: 20px;
+      color: var(--accent-primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .hero-title {
+      font-size: 2.5rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    [data-theme="light"] .hero-title {
+      background: linear-gradient(135deg, #0f172a 30%, var(--accent-primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-lead {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      max-width: 850px;
+    }
+
+    .doc-section {
+      margin-bottom: 4rem;
+      scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    }
+    .section-title {
+      font-size: 1.65rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+      position: relative;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 60px;
+      height: 2px;
+      background: var(--accent-primary);
+    }
+    .section-title i {
+      color: var(--accent-primary);
+      font-size: 1.3rem;
+    }
+
+    .doc-subtitle {
+      font-size: 1.2rem;
+      margin: 2rem 0 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .doc-subtitle i {
+      color: var(--accent-secondary);
+      font-size: 1rem;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+      color: var(--text-secondary);
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .card:hover {
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-md), 0 0 20px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--bg-tertiary);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border-color);
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+    }
+
+    /* Badges & Pills */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-primary { background: rgba(56, 189, 248, 0.15); color: var(--accent-primary); border: 1px solid var(--accent-primary); }
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-info { background: rgba(99, 102, 241, 0.15); color: var(--info); border: 1px solid var(--info); }
+    .badge-method {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .method-get { background: #0369a1; color: #e0f2fe; }
+    .method-post { background: #15803d; color: #dcfce7; }
+    .method-delete { background: #b91c1c; color: #fee2e2; }
+
+    /* Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover td {
+      background: rgba(56, 189, 248, 0.03);
+    }
+
+    /* Code Blocks */
+    .code-wrapper {
+      position: relative;
+      margin: 1.5rem 0;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid var(--border-color);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .code-header .lang-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+    .btn-copy {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+    pre {
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+    code {
+      font-family: 'Fira Code', monospace;
+    }
+    p code, li code, td code {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.84em;
+      color: var(--accent-primary);
+    }
+
+    /* Callout Boxes */
+    .callout {
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      margin: 1.5rem 0;
+      display: flex;
+      gap: 1rem;
+      background: var(--bg-tertiary);
+      border-left: 4px solid var(--accent-primary);
+    }
+    .callout-icon {
+      font-size: 1.25rem;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .callout-content p:last-child {
+      margin-bottom: 0;
+    }
+    .callout.callout-info { border-left-color: var(--accent-primary); background: rgba(56, 189, 248, 0.08); }
+    .callout.callout-warning { border-left-color: var(--warning); background: rgba(245, 158, 11, 0.08); }
+    .callout.callout-warning .callout-icon { color: var(--warning); }
+    .callout.callout-danger { border-left-color: var(--danger); background: rgba(239, 68, 68, 0.08); }
+    .callout.callout-danger .callout-icon { color: var(--danger); }
+    .callout.callout-success { border-left-color: var(--success); background: rgba(16, 185, 129, 0.08); }
+    .callout.callout-success .callout-icon { color: var(--success); }
+
+    /* Workflow Diagram (Pure CSS/HTML) */
+    .architecture-diagram {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-md);
+    }
+    .flow-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .flow-node {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      text-align: center;
+      min-width: 170px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s;
+    }
+    .flow-node:hover {
+      border-color: var(--accent-primary);
+      transform: scale(1.03);
+    }
+    .flow-node.highlight {
+      border-color: var(--accent-primary);
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .flow-node i {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent-primary);
+    }
+    .flow-node .title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    .flow-node .subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .flow-arrow {
+      color: var(--accent-primary);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Math Formula box */
+    .formula-box {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.5rem;
+      margin: 1rem 0;
+      font-family: 'Fira Code', monospace;
+      color: var(--accent-primary);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* Accordion */
+    .accordion-item {
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      margin-bottom: 0.75rem;
+      background: var(--bg-secondary);
+      overflow: hidden;
+    }
+    .accordion-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-weight: 600;
+      user-select: none;
+      transition: background 0.2s;
+    }
+    .accordion-header:hover {
+      background: var(--bg-tertiary);
+    }
+    .accordion-body {
+      padding: 1.25rem;
+      border-top: 1px solid var(--border-color);
+      display: none;
+    }
+    .accordion-item.active .accordion-body {
+      display: block;
+    }
+    .accordion-item.active .accordion-header i {
+      transform: rotate(180deg);
+    }
+
+    @media print {
+      .top-header, .doc-sidebar, .btn-copy, .btn-icon, .search-box {
+        display: none !important;
+      }
+      .doc-main {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+      .card, .table-container, .code-wrapper {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-header">
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <button class="btn-icon mobile-menu-btn" id="toggleSidebar" aria-label="Toggle Menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <a href="#" class="brand-container">
+        <div class="brand-badge">BBS</div>
+        <div>
+          <div class="brand-title">Índice BBS por Embarcação</div>
+          <div class="brand-subtitle">C-Innovation Documentation</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-actions">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="docSearch" placeholder="Buscar na documentação...">
+      </div>
+      <button class="btn-icon" id="themeToggle" title="Alternar Tema Claro/Escuro">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <button class="btn-icon" onclick="window.print()" title="Imprimir / Exportar PDF">
+        <i class="fa-solid fa-print"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Documentation Layout -->
+  <div class="doc-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="doc-sidebar" id="sidebar">
+      <div class="sidebar-category">Visão Geral</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="#visao-geral" class="sidebar-link active"><i class="fa-solid fa-house"></i> Introdução & Escopo</a></li>
+        <li class="sidebar-item"><a href="#arquitetura" class="sidebar-link"><i class="fa-solid fa-cubes"></i> Arquitetura & Stack</a></li>
+        <li class="sidebar-item"><a href="#fluxo-autenticacao" class="sidebar-link"><i class="fa-solid fa-shield-halved"></i> SSO & Segurança</a></li>
+      </ul>
+
+      <div class="sidebar-category">Modelo & Regras de Negócio</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="#regras-calculo" class="sidebar-link"><i class="fa-solid fa-calculator"></i> Regras & Fórmulas KPI</a></li>
+        <li class="sidebar-item"><a href="#criterios-falha" class="sidebar-link"><i class="fa-solid fa-triangle-exclamation"></i> Critérios de Falha (C1-C4)</a></li>
+        <li class="sidebar-item"><a href="#maturidade-sms" class="sidebar-link"><i class="fa-solid fa-chart-line"></i> Metas de Maturidade SMS</a></li>
+        <li class="sidebar-item"><a href="#modelo-dados" class="sidebar-link"><i class="fa-solid fa-database"></i> Modelo de Dados (Schema)</a></li>
+      </ul>
+
+      <div class="sidebar-category">Módulos & Funcionalidades</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="#modulo-dashboard" class="sidebar-link"><i class="fa-solid fa-gauge-high"></i> Dashboard Executivo</a></li>
+        <li class="sidebar-item"><a href="#modulo-lancamentos" class="sidebar-link"><i class="fa-solid fa-pen-to-square"></i> Lançamentos (CRUD)</a></li>
+        <li class="sidebar-item"><a href="#modulo-relatorios" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i> Relatórios & Pareto</a></li>
+        <li class="sidebar-item"><a href="#modulo-admin" class="sidebar-link"><i class="fa-solid fa-gear"></i> Painel de Administração</a></li>
+        <li class="sidebar-item"><a href="#modulo-exportacao" class="sidebar-link"><i class="fa-solid fa-file-csv"></i> Exportação CSV & BI</a></li>
+      </ul>
+
+      <div class="sidebar-category">Operação & Infraestrutura</div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-item"><a href="#endpoints-api" class="sidebar-link"><i class="fa-solid fa-network-wired"></i> Rotas e Endpoints</a></li>
+        <li class="sidebar-item"><a href="#guia-deploy" class="sidebar-link"><i class="fa-brands fa-docker"></i> Deploy & Docker</a></li>
+        <li class="sidebar-item"><a href="#config-apache" class="sidebar-link"><i class="fa-solid fa-server"></i> Apache Reverse Proxy</a></li>
+        <li class="sidebar-item"><a href="#importacao-xlsx" class="sidebar-link"><i class="fa-solid fa-file-excel"></i> Importação de Planilha</a></li>
+        <li class="sidebar-item"><a href="#troubleshooting" class="sidebar-link"><i class="fa-solid fa-wrench"></i> Troubleshooting & FAQ</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="doc-main">
+      
+      <!-- Hero / Header Section -->
+      <section class="hero-section">
+        <div class="hero-badge"><i class="fa-solid fa-code-branch"></i> Versão 1.0 — Produção</div>
+        <h1 class="hero-title">Sistema de Gestão do Índice BBS</h1>
+        <p class="hero-lead">
+          Documentação técnica detalhada da aplicação web corporativa da <strong>C-Innovation</strong> para monitoramento, apuração mensal de KPIs de segurança comportamental (BBS), diagnóstico de falhas operacionais e avaliação de maturidade SMS por embarcação e ROV.
+        </p>
+      </section>
+
+      <!-- Section: Visão Geral -->
+      <section id="visao-geral" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-compass"></i> 1. Visão Geral & Propósito</h2>
+        <p>
+          O <strong>Índice BBS (Behavior Based Safety)</strong> é o principal indicador de segurança comportamental aplicado nas operações offshore de ROV da C-Innovation. Ele avalia a qualidade e a conformidade dos relatos e registros de segurança emitidos pelas equipes a bordo das embarcações.
+        </p>
+        
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-ship"></i></div>
+            <div class="card-title">Substituição do Excel</div>
+            <p class="card-desc">Substitui a planilha histórica legada <code>Indice_BBS_por_Embarcacao_v10_ATUALIZADA.xlsx</code> por uma plataforma web multiusuário com integridade referencial.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="card-title">Análise Qualitativa SMS</div>
+            <p class="card-desc">Categorização de Não Conformidades nos 5 critérios operacionais (C1 a C4-Elo), gerando curvas de Pareto e matrizes térmicas.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+            <div class="card-title">Metas por Maturidade</div>
+            <p class="card-desc">Avaliação dinâmica com base no grau de maturidade em SMS de cada navio (Inicial 80%, Estável 87%, Maduro 92%).</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon"><i class="fa-solid fa-circle-info"></i></div>
+          <div class="callout-content">
+            <strong>Publicação Oficial:</strong>
+            <p>O sistema está disponível em ambiente de produção através da URL <code>https://hub.c-innovation.com.br/bbs/</code>, integrado ao ecossistema do Authentik SSO sob o subpath <code>/bbs</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Arquitetura -->
+      <section id="arquitetura" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-cubes"></i> 2. Arquitetura do Sistema & Stack</h2>
+        <p>
+          A aplicação adota uma arquitetura em camadas leve, resiliente e conteinerizada, focada em alto desempenho, renderização no servidor (SSR) rápida e baixa sobrecarga de manutenção.
+        </p>
+
+        <!-- Architecture Flow Diagram -->
+        <div class="architecture-diagram">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.05em; text-align: center;">
+            Fluxo de Requisição & Comunicação
+          </div>
+          <div class="flow-row">
+            <div class="flow-node">
+              <i class="fa-solid fa-globe"></i>
+              <div class="title">Navegador</div>
+              <div class="subtitle">Usuário C-Innovation</div>
+            </div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node highlight">
+              <i class="fa-solid fa-shield-halved"></i>
+              <div class="title">Authentik SSO</div>
+              <div class="subtitle">Forward-Auth Proxy</div>
+            </div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node">
+              <i class="fa-solid fa-server"></i>
+              <div class="title">Apache 2.4</div>
+              <div class="subtitle">Reverse Proxy (:443)</div>
+            </div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node highlight">
+              <i class="fa-solid fa-bolt"></i>
+              <div class="title">FastAPI App</div>
+              <div class="subtitle">Container (:18010)</div>
+            </div>
+            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            <div class="flow-node">
+              <i class="fa-solid fa-database"></i>
+              <div class="title">PostgreSQL 16</div>
+              <div class="subtitle">Banco Relacional</div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="doc-subtitle"><i class="fa-solid fa-layer-group"></i> Componentes da Stack Tecnológica</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Camada</th>
+                <th>Tecnologia / Biblioteca</th>
+                <th>Versão / Detalhe</th>
+                <th>Finalidade</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Backend Core</strong></td>
+                <td>Python / FastAPI</td>
+                <td><code>fastapi==0.110.x</code></td>
+                <td>Roteamento de alta performance, injeção de dependências e handlers assíncronos.</td>
+              </tr>
+              <tr>
+                <td><strong>ORM & BD</strong></td>
+                <td>SQLAlchemy / psycopg2-binary</td>
+                <td><code>SQLAlchemy==2.0.x</code></td>
+                <td>Mapeamento relacional, queries de agregação analítica e controle transacional.</td>
+              </tr>
+              <tr>
+                <td><strong>Template Engine</strong></td>
+                <td>Jinja2</td>
+                <td><code>jinja2==3.1.x</code></td>
+                <td>Renderização server-side de templates HTML dinâmicos.</td>
+              </tr>
+              <tr>
+                <td><strong>Frontend UI</strong></td>
+                <td>Bootstrap 5 + CSS Customizado</td>
+                <td>Bootstrap 5.3 + FontAwesome 6</td>
+                <td>Interface responsiva, componentes visuais e identidade corporativa C-Innovation.</td>
+              </tr>
+              <tr>
+                <td><strong>Gráficos</strong></td>
+                <td>Chart.js + Datalabels</td>
+                <td>Chart.js v4.4</td>
+                <td>Renderização de gráficos de linha, barras empilhadas e diagramas de Pareto.</td>
+              </tr>
+              <tr>
+                <td><strong>Banco de Dados</strong></td>
+                <td>PostgreSQL</td>
+                <td>16-Alpine</td>
+                <td>Persistência com constraints de validação (CK) e chaves estrangeiras relacionais.</td>
+              </tr>
+              <tr>
+                <td><strong>Autenticação</strong></td>
+                <td>Authentik</td>
+                <td>Forward-Auth Headers</td>
+                <td>Single Sign-On (SSO) corporativo com leitura de grupos e papéis.</td>
+              </tr>
+              <tr>
+                <td><strong>Conteinerização</strong></td>
+                <td>Docker & Docker Compose</td>
+                <td>Compose v2</td>
+                <td>Orquestração local e isolamento na instância EC2 AWS.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Autenticação & SSO -->
+      <section id="fluxo-autenticacao" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-shield-halved"></i> 3. Autenticação, Autorização & Segurança</h2>
+        <p>
+          A aplicação opera 100% integrada ao <strong>Authentik SSO</strong> do Hub C-Innovation via cabeçalhos HTTP confiáveis injetados pelo <em>Embedded Outpost</em> (Forward-Auth).
+        </p>
+
+        <h3 class="doc-subtitle"><i class="fa-solid fa-address-card"></i> Headers HTTP de Autenticação</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Header HTTP</th>
+                <th>Exemplo</th>
+                <th>Uso na Aplicação (<code>auth_headers.py</code>)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>X-Authentik-Email</code></td>
+                <td><code>ricardo.meleiro@c-innovation.com.br</code></td>
+                <td>Identificador primário único do usuário; aciona o upsert automático na tabela <code>users</code>.</td>
+              </tr>
+              <tr>
+                <td><code>X-Authentik-Username</code></td>
+                <td><code>ricardo.meleiro</code></td>
+                <td>Login do usuário no diretório corporativo.</td>
+              </tr>
+              <tr>
+                <td><code>X-Authentik-Name</code></td>
+                <td><code>Ricardo Meleiro</code></td>
+                <td>Nome de exibição exibido no topo da navbar.</td>
+              </tr>
+              <tr>
+                <td><code>X-Authentik-Groups</code></td>
+                <td><code>perfil-ti-admin, bbs-editor</code></td>
+                <td>Lista de grupos separados por vírgula para mapeamento dinâmico de papéis.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="doc-subtitle"><i class="fa-solid fa-user-lock"></i> Hierarquia de Papéis e Permissões</h3>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon" style="color: var(--accent-primary);"><i class="fa-solid fa-eye"></i></div>
+            <div class="card-title">Viewer</div>
+            <div class="badge badge-primary" style="margin-bottom: 0.5rem;">Padrão</div>
+            <p class="card-desc">Visualiza Dashboard, relatórios de evolução, Pareto, ranking, heatmap e exporta dados em CSV.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon" style="color: var(--warning);"><i class="fa-solid fa-pen-nib"></i></div>
+            <div class="card-title">Editor</div>
+            <div class="badge badge-warning" style="margin-bottom: 0.5rem;">Grupos: perfil-gerente, analista</div>
+            <p class="card-desc">Permissões de Viewer + criar, atualizar e excluir lançamentos mensais de ROVs.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon" style="color: var(--danger);"><i class="fa-solid fa-user-gear"></i></div>
+            <div class="card-title">Admin</div>
+            <div class="badge badge-danger" style="margin-bottom: 0.5rem;">Grupos: perfil-ti-admin, diretor</div>
+            <p class="card-desc">Acesso total: gerenciar embarcações, definir maturidade anual, promover usuários e inspecionar auditoria.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="fa-solid fa-lock"></i></div>
+          <div class="callout-content">
+            <strong>Proteção contra Lockout de Administradores:</strong>
+            <p>Se um usuário for promovido manualmente a <code>Admin</code> através da interface em <code>/admin/users</code>, sua função é fixada no banco de dados e não será rebaixada mesmo que o usuário seja removido dos grupos do Authentik.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Regras de Cálculo -->
+      <section id="regras-calculo" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-calculator"></i> 4. Regras de Negócio & Fórmulas de KPI</h2>
+        <p>
+          Os indicadores refletem a proporção de registros de comportamento seguro e correto versus o volume total de relatos inspecionados no mês.
+        </p>
+
+        <h3 class="doc-subtitle"><i class="fa-solid fa-square-root-variable"></i> Fórmulas Matemáticas</h3>
+        
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">1. Registros Conformes</div>
+          <p class="card-desc">Calculado subtraindo-se os não conformes do total de BBS lançados no período:</p>
+          <div class="formula-box">
+            Conformes = max(Total_BBS - Não_Conformes, 0)
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">2. Índice BBS (% Conforme)</div>
+          <p class="card-desc">Representa a taxa percentual de conformidade da embarcação:</p>
+          <div class="formula-box">
+            KPI_BBS (%) = (Conformes / Total_BBS) × 100
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary);">3. Taxa de Não Conformidade (% NC)</div>
+          <p class="card-desc">Representa o índice de rejeição / inconformidade:</p>
+          <div class="formula-box">
+            NC (%) = (Não_Conformes / Total_BBS) × 100
+          </div>
+        </div>
+
+        <!-- Section: Critérios de Falha -->
+        <h2 id="criterios-falha" class="section-title" style="margin-top: 3rem;"><i class="fa-solid fa-triangle-exclamation"></i> 5. Critérios de Falha (C1 a C4-Elo)</h2>
+        <p>
+          Quando um cartão BBS é classificado como <strong>Não Conforme</strong>, as falhas são discriminadas nos seguintes critérios operacionais para apuração de Pareto:
+        </p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Critério SMS</th>
+                <th>Descrição Operacional</th>
+                <th>Impacto & Ação Recomendada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-info">C1</span></td>
+                <td><strong>Nome / Função</strong></td>
+                <td>Preenchimento incorreto ou omissão do nome, matrícula, função ou equipe envolvida na observação.</td>
+                <td>Orientação e treinamento na identificação correta dos autores e envolvidos.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-warning">C2</span></td>
+                <td><strong>Classificação Incoerente</strong></td>
+                <td>Incongruência entre a descrição do fato e a categoria de risco selecionada (ex: ato vs condição).</td>
+                <td>Reciclagem sobre conceitos de perigo, ato inseguro e condição abaixo do padrão.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-danger">C3</span></td>
+                <td><strong>Dano Potencial</strong></td>
+                <td>Avaliação equivocada da severidade e do potencial de gravidade da ocorrência.</td>
+                <td>Reforço na matriz de risco e classificação de severidade C-Innovation.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-primary">C4 · CRM</span></td>
+                <td><strong>Falha de CRM</strong></td>
+                <td>Deficiências em gerenciamento de recursos da equipe (comunicação, liderança, consciência situacional).</td>
+                <td>Briefing pré-operação e dinâmicas de Crew Resource Management.</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-success">C4 · Elo</span></td>
+                <td><strong>Falha de Elo</strong></td>
+                <td>Falha no ciclo de feedback, retorno ao observador ou tratativa da ação corretiva.</td>
+                <td>Acompanhamento das lideranças de bordo no fechamento dos planos de ação.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Maturidade SMS -->
+      <section id="maturidade-sms" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> 6. Metas de Maturidade SMS</h2>
+        <p>
+          A meta percentual de conformidade de cada embarcação é dinâmica e vinculada ao seu nível de maturidade em Segurança, Meio Ambiente e Saúde (SMS) cadastrado anualmente:
+        </p>
+
+        <div class="grid-3">
+          <div class="card" style="border-top: 4px solid var(--info);">
+            <div class="card-title">Maturidade Inicial</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-primary); margin: 0.5rem 0;">80%</div>
+            <p class="card-desc">Embarcações em fase de implantação de cultura SMS ou novos contratos/tripulações.</p>
+          </div>
+          <div class="card" style="border-top: 4px solid var(--warning);">
+            <div class="card-title">Maturidade Estável</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--warning); margin: 0.5rem 0;">87%</div>
+            <p class="card-desc">Operações consolidadas com processos estáveis de observação comportamental.</p>
+          </div>
+          <div class="card" style="border-top: 4px solid var(--success);">
+            <div class="card-title">Maturidade Maduro</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--success); margin: 0.5rem 0;">92%</div>
+            <p class="card-desc">Alto grau de excelência operacional e engajamento proativo de segurança.</p>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon"><i class="fa-solid fa-lightbulb"></i></div>
+          <div class="callout-content">
+            <strong>Valor Padrão:</strong>
+            <p>Se uma embarcação não possuir cadastro de maturidade explícito para o ano corrente na tabela <code>vessel_maturities</code>, o sistema adota automaticamente o nível <strong>Inicial (Meta: 80%)</strong>.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Modelo de Dados -->
+      <section id="modelo-dados" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-database"></i> 7. Modelo de Dados & Schema do PostgreSQL</h2>
+        <p>
+          O banco de dados relacional foi projetado para garantir total integridade, unicidade de lançamentos por mês/ROV e trilha de auditoria completa.
+        </p>
+
+        <!-- Accordion for Database Tables -->
+        <div class="accordion-item active">
+          <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+            <span><i class="fa-solid fa-table"></i> Tabela <code>monthly_entries</code> (Lançamentos Mensais)</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-body">
+            <p>Armazena os totais mensais de BBS e o detalhamento de falhas por ROV.</p>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Coluna</th>
+                    <th>Tipo</th>
+                    <th>Restrições</th>
+                    <th>Descrição</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>id</code></td><td>Integer</td><td>PK, Auto-increment</td><td>Identificador primário do registro.</td></tr>
+                  <tr><td><code>year</code></td><td>Integer</td><td>NOT NULL, Index</td><td>Ano de referência (ex: 2026).</td></tr>
+                  <tr><td><code>month</code></td><td>Integer</td><td>NOT NULL, Check (1..12)</td><td>Mês de referência (1 a 12).</td></tr>
+                  <tr><td><code>rov_id</code></td><td>Integer</td><td>FK -> rovs.id, NOT NULL</td><td>Referência ao ROV vinculado.</td></tr>
+                  <tr><td><code>total_bbs</code></td><td>Integer</td><td>NOT NULL, Check (>= 0)</td><td>Total de cartões BBS registrados.</td></tr>
+                  <tr><td><code>non_conforming</code></td><td>Integer</td><td>NOT NULL, Check (NC <= Total)</td><td>Total de cartões não conformes.</td></tr>
+                  <tr><td><code>c1</code></td><td>Integer</td><td>Default 0, NOT NULL</td><td>Falhas no critério C1 (Nome/Função).</td></tr>
+                  <tr><td><code>c2</code></td><td>Integer</td><td>Default 0, NOT NULL</td><td>Falhas no critério C2 (Classificação).</td></tr>
+                  <tr><td><code>c3</code></td><td>Integer</td><td>Default 0, NOT NULL</td><td>Falhas no critério C3 (Dano Potencial).</td></tr>
+                  <tr><td><code>c4_crm</code></td><td>Integer</td><td>Default 0, NOT NULL</td><td>Falhas no critério C4 (CRM).</td></tr>
+                  <tr><td><code>c4_elo</code></td><td>Integer</td><td>Default 0, NOT NULL</td><td>Falhas no critério C4 (Elo).</td></tr>
+                  <tr><td><code>observations</code></td><td>String(500)</td><td>Nullable</td><td>Observações textuais de bordo.</td></tr>
+                  <tr><td><code>created_by_id</code></td><td>Integer</td><td>FK -> users.id</td><td>Usuário que efetuou a criação.</td></tr>
+                  <tr><td><code>updated_by_id</code></td><td>Integer</td><td>FK -> users.id</td><td>Último usuário que editou o registro.</td></tr>
+                  <tr><td><code>created_at</code></td><td>DateTime</td><td>Default NOW()</td><td>Timestamp de inserção.</td></tr>
+                  <tr><td><code>updated_at</code></td><td>DateTime</td><td>Default NOW(), OnUpdate</td><td>Timestamp de última modificação.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="callout callout-warning">
+              <div class="callout-icon"><i class="fa-solid fa-key"></i></div>
+              <div class="callout-content">
+                <strong>Unique Constraint:</strong> <code>UniqueConstraint("year", "month", "rov_id", name="uq_year_month_rov")</code> impede duplicidade de lançamento para o mesmo ROV no mesmo mês.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+            <span><i class="fa-solid fa-table"></i> Tabelas <code>vessels</code> e <code>rovs</code> (Ativos Operacionais)</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="grid-2">
+              <div>
+                <h4 style="margin-bottom: 0.5rem; color: var(--accent-primary);"><code>vessels</code></h4>
+                <div class="table-container">
+                  <table>
+                    <thead><tr><th>Coluna</th><th>Tipo</th><th>Detalhe</th></tr></thead>
+                    <tbody>
+                      <tr><td><code>id</code></td><td>Integer</td><td>PK</td></tr>
+                      <tr><td><code>name</code></td><td>String(100)</td><td>Nome (ex: Far Superior)</td></tr>
+                      <tr><td><code>contractor</code></td><td>String(100)</td><td>Contratante (ex: Petrobras)</td></tr>
+                      <tr><td><code>is_active</code></td><td>Boolean</td><td>Status operacional</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <h4 style="margin-bottom: 0.5rem; color: var(--accent-primary);"><code>rovs</code></h4>
+                <div class="table-container">
+                  <table>
+                    <thead><tr><th>Coluna</th><th>Tipo</th><th>Detalhe</th></tr></thead>
+                    <tbody>
+                      <tr><td><code>id</code></td><td>Integer</td><td>PK</td></tr>
+                      <tr><td><code>rov_id</code></td><td>String(50)</td><td>Tag única (ex: UHD 45)</td></tr>
+                      <tr><td><code>vessel_id</code></td><td>Integer</td><td>FK -> vessels.id</td></tr>
+                      <tr><td><code>model</code></td><td>String(50)</td><td>Modelo (ex: UHD, Millennium)</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+            <span><i class="fa-solid fa-table"></i> Tabelas <code>users</code>, <code>vessel_maturities</code> e <code>audit_logs</code></span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Tabela</th><th>Finalidade</th><th>Principais Colunas</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><code>users</code></td>
+                    <td>Controle de usuários e permissões sincronizados via SSO.</td>
+                    <td><code>id</code>, <code>email</code>, <code>username</code>, <code>name</code>, <code>role (viewer|editor|admin)</code>, <code>authentik_groups</code>, <code>last_login_at</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>vessel_maturities</code></td>
+                    <td>Classificação anual de maturidade SMS por embarcação.</td>
+                    <td><code>id</code>, <code>vessel_id</code>, <code>year</code>, <code>maturity (INICIAL|ESTAVEL|MADURO)</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>audit_logs</code></td>
+                    <td>Trilha de conformidade de todas as ações de escrita e alteração.</td>
+                    <td><code>id</code>, <code>user_id</code>, <code>action</code>, <code>entity_type</code>, <code>entity_id</code>, <code>details (JSON)</code>, <code>ip_address</code>, <code>created_at</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Módulos do Sistema -->
+      <section id="modulo-dashboard" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-gauge-high"></i> 8. Módulos & Telas do Sistema</h2>
+
+        <!-- Dashboard -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title" style="color: var(--accent-primary); font-size: 1.25rem;">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard Executivo (<code>/dashboard</code>)
+          </h3>
+          <p>Visão gerencial mensal consolidada da frota C-Innovation:</p>
+          <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary);">
+            <li><strong>Cartões KPI Topo:</strong> Total BBS Frota, Conformes, Não Conformes e % Geral da Frota.</li>
+            <li><strong>Status da Meta:</strong> Contador de embarcações que atingiram a meta de maturidade no mês selecionado.</li>
+            <li><strong>Tabela Analítica:</strong> Rollup por embarcação listando Total BBS, Conformes, Não Conformes, KPI %, Meta de Maturidade e badge de status (Atingiu / Não Atingiu).</li>
+          </ul>
+        </div>
+
+        <!-- Lançamentos -->
+        <div id="modulo-lancamentos" class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title" style="color: var(--warning); font-size: 1.25rem;">
+            <i class="fa-solid fa-pen-to-square"></i> Gestão de Lançamentos (<code>/entries</code>)
+          </h3>
+          <p>Módulo operacional para inserção, consulta e edição de dados de BBS por ROV:</p>
+          <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary);">
+            <li><strong>Filtros Avançados:</strong> Filtragem instantânea por Ano, Mês e ROV específico.</li>
+            <li><strong>Formulário com Validação em Tempo Real:</strong> Validação para impedir valores negativos e bloquear <code>Não Conformes &gt; Total BBS</code>.</li>
+            <li><strong>Discriminação de Critérios:</strong> Campos dedicados para C1, C2, C3, C4-CRM e C4-Elo.</li>
+            <li><strong>Log de Auditoria Automático:</strong> Toda inserção, edição ou deleção registra IP e payload no <code>audit_logs</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Relatórios -->
+        <div id="modulo-relatorios" class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title" style="color: var(--info); font-size: 1.25rem;">
+            <i class="fa-solid fa-chart-simple"></i> Módulo de Relatórios & Análises
+          </h3>
+          <div class="grid-2" style="margin-top: 1rem;">
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-md);">
+              <div style="font-weight: 600; color: var(--accent-primary);"><i class="fa-solid fa-chart-line"></i> Evolução Temporal (<code>/reports/evolucao</code>)</div>
+              <p style="font-size: 0.85rem; margin-top: 0.25rem;">Gráfico interativo de 12 meses comparando o índice da frota com curvas individuais por embarcação.</p>
+            </div>
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-md);">
+              <div style="font-weight: 600; color: var(--warning);"><i class="fa-solid fa-chart-column"></i> Curva de Pareto (<code>/reports/pareto</code>)</div>
+              <p style="font-size: 0.85rem; margin-top: 0.25rem;">Diagrama com ordenação decrescente de falhas e linha de percentual acumulado de 0 a 100%.</p>
+            </div>
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-md);">
+              <div style="font-weight: 600; color: var(--success);"><i class="fa-solid fa-trophy"></i> Ranking Anual (<code>/reports/ranking</code>)</div>
+              <p style="font-size: 0.85rem; margin-top: 0.25rem;">Classificação das embarcações do maior para o menor KPI com comparativo em relação à meta SMS.</p>
+            </div>
+            <div style="background: var(--bg-tertiary); padding: 1rem; border-radius: var(--radius-md);">
+              <div style="font-weight: 600; color: #ec4899;"><i class="fa-solid fa-table-cells"></i> Heatmap de Desempenho (<code>/reports/heatmap</code>)</div>
+              <p style="font-size: 0.85rem; margin-top: 0.25rem;">Matriz de calor (Navios × Meses) com coloração visual imediata (verde para >= meta, amarelo e vermelho).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin -->
+        <div id="modulo-admin" class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title" style="color: var(--danger); font-size: 1.25rem;">
+            <i class="fa-solid fa-gear"></i> Painel Administrativo (<code>/admin</code>)
+          </h3>
+          <ul style="margin-left: 1.5rem; margin-bottom: 1rem; color: var(--text-secondary);">
+            <li><code>/admin/vessels</code>: Edição de nomes de embarcações, contratantes e status de ativação.</li>
+            <li><code>/admin/maturidade</code>: Matriz anual de configuração do nível SMS de cada navio (com atualização em lote).</li>
+            <li><code>/admin/users</code>: Gestão de usuários, alteração manual de perfil (Viewer/Editor/Admin) e ativação.</li>
+            <li><code>/admin/audit</code>: Console de consulta dos últimos eventos e auditoria com detalhes em JSON.</li>
+          </ul>
+        </div>
+
+        <!-- Export -->
+        <div id="modulo-exportacao" class="card">
+          <h3 class="card-title" style="color: var(--success); font-size: 1.25rem;">
+            <i class="fa-solid fa-file-csv"></i> Exportação de Dados (<code>/export/entries.csv</code>)
+          </h3>
+          <p>Exporta toda a base de lançamentos em formato CSV estruturado com codificação UTF-8 (BOM), facilitando a importação direta no Microsoft Excel, Power BI ou pipelines analíticos.</p>
+        </div>
+      </section>
+
+      <!-- Section: Rotas e Endpoints -->
+      <section id="endpoints-api" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-network-wired"></i> 9. Mapeamento de Rotas e Endpoints</h2>
+        <p>
+          Relação de todas as rotas servidas pela aplicação sob o prefixo <code>/bbs</code>:
+        </p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Método</th>
+                <th>Endpoint</th>
+                <th>Papel Mínimo</th>
+                <th>Descrição / Resposta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/</code></td><td>Público / Auth</td><td>Redireciona para <code>/dashboard</code> se autenticado ou retorna 401.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/health</code></td><td>Público</td><td>Healthcheck do container Docker (retorna texto <code>ok</code>).</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/dashboard</code></td><td>Viewer</td><td>Visão consolidada mensal com cartões KPI e tabela de embarcações.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/entries</code></td><td>Viewer</td><td>Listagem paginada/filtrada de lançamentos mensais.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/entries/new</code></td><td>Editor</td><td>Formulário de criação de lançamento mensal por ROV.</td></tr>
+              <tr><td><span class="badge-method method-post">POST</span></td><td><code>/entries</code></td><td>Editor</td><td>Processa e valida a criação de um novo lançamento.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/entries/{id}/edit</code></td><td>Editor</td><td>Formulário de edição do lançamento existente.</td></tr>
+              <tr><td><span class="badge-method method-post">POST</span></td><td><code>/entries/{id}</code></td><td>Editor</td><td>Atualiza dados do lançamento e salva log de auditoria.</td></tr>
+              <tr><td><span class="badge-method method-post">POST</span></td><td><code>/entries/{id}/delete</code></td><td>Editor</td><td>Exclui um lançamento do banco de dados.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/reports/evolucao</code></td><td>Viewer</td><td>Relatório com gráfico de evolução temporal anual.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/reports/pareto</code></td><td>Viewer</td><td>Gráfico de Pareto das falhas e tabela de acumulado.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/reports/ranking</code></td><td>Viewer</td><td>Classificação anual das embarcações com taxa de conformidade.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/reports/heatmap</code></td><td>Viewer</td><td>Matriz de calor anual 12 meses × embarcações.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/reports/contratante</code></td><td>Viewer</td><td>Consolidado de KPIs agrupados por cliente/contratante.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/export/entries.csv</code></td><td>Viewer</td><td>Download do dump de lançamentos em formato CSV.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/admin/vessels</code></td><td>Admin</td><td>Gestão de embarcações ativas e contratantes.</td></tr>
+              <tr><td><span class="badge-method method-post">POST</span></td><td><code>/admin/vessels/{id}</code></td><td>Admin</td><td>Atualização de cadastro de embarcação.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/admin/maturidade</code></td><td>Admin</td><td>Matriz de configuração de metas e maturidade SMS.</td></tr>
+              <tr><td><span class="badge-method method-post">POST</span></td><td><code>/admin/maturidade</code></td><td>Admin</td><td>Salva em lote os níveis de maturidade para o ano.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/admin/users</code></td><td>Admin</td><td>Gestão de usuários, papéis e ativação.</td></tr>
+              <tr><td><span class="badge-method method-post">POST</span></td><td><code>/admin/users/{id}</code></td><td>Admin</td><td>Atualiza papel (role) e status do usuário.</td></tr>
+              <tr><td><span class="badge-method method-get">GET</span></td><td><code>/admin/audit</code></td><td>Admin</td><td>Visualização da trilha de auditoria e ações dos usuários.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Deploy e Docker -->
+      <section id="guia-deploy" class="doc-section">
+        <h2 class="section-title"><i class="fa-brands fa-docker"></i> 10. Guia de Instalação, Docker & Deploy</h2>
+        
+        <h3 class="doc-subtitle"><i class="fa-solid fa-laptop-code"></i> 10.1 Execução Local (Ambiente de Desenvolvimento)</h3>
+        <p>Para executar o sistema localmente em modo de desenvolvimento:</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span class="lang-tag"><i class="fa-solid fa-terminal"></i> Bash / Shell</span>
+            <button class="btn-copy" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copiar</button>
+          </div>
+          <pre><code># 1. Clone ou acesse o repositório
+cd "G:\Meu Drive\Claude\Indice-BBS"
+
+# 2. Copie o arquivo de variáveis de ambiente
+cp .env.example .env
+
+# 3. Configure as seguintes variáveis no .env:
+# DEV_MODE=1
+# DEV_USER_EMAIL=dev@c-innovation.com.br
+# DEV_USER_ROLE=admin
+
+# 4. Inicie os containers com build
+docker compose up --build
+
+# 5. Acesse no navegador:
+# http://localhost:18010</code></pre>
+        </div>
+
+        <h3 class="doc-subtitle"><i class="fa-solid fa-cloud-arrow-up"></i> 10.2 Deploy em Produção (EC2 AWS)</h3>
+        <p>Procedimento para publicação na instância de produção (<code>18.188.46.180</code>):</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span class="lang-tag"><i class="fa-solid fa-terminal"></i> Bash no Servidor EC2</span>
+            <button class="btn-copy" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copiar</button>
+          </div>
+          <pre><code># 1. No servidor EC2, acesse o diretório da aplicação:
+cd /home/ubuntu/indice-bbs
+
+# 2. Garanta que o .env de produção esteja configurado:
+# DEV_MODE=0
+# POSTGRES_PASSWORD=senha_forte_gerada
+
+# 3. Suba os containers em segundo plano:
+docker compose up -d --build
+
+# 4. Verifique o status dos containers:
+docker compose ps
+curl -sI http://127.0.0.1:18010/health   # Deve retornar HTTP 200 "ok"</code></pre>
+        </div>
+
+        <h3 class="doc-subtitle"><i class="fa-solid fa-sliders"></i> 10.3 Variáveis de Ambiente (<code>.env</code>)</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Variável</th>
+                <th>Exemplo Padrão</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>POSTGRES_DB</code></td><td><code>indicebbs</code></td><td>Nome do banco de dados no PostgreSQL.</td></tr>
+              <tr><td><code>POSTGRES_USER</code></td><td><code>indicebbs</code></td><td>Usuário de conexão com o banco.</td></tr>
+              <tr><td><code>POSTGRES_PASSWORD</code></td><td><code>sua_senha_secreta</code></td><td>Senha do usuário do banco.</td></tr>
+              <tr><td><code>DATABASE_URL</code></td><td><code>postgresql://...</code></td><td>String de conexão do SQLAlchemy.</td></tr>
+              <tr><td><code>ROOT_PATH</code></td><td><code>/bbs</code></td><td>Subpath da aplicação no proxy reverso do Apache.</td></tr>
+              <tr><td><code>BASE_URL</code></td><td><code>https://hub.c-innovation.com.br/bbs</code></td><td>URL pública base para montagem de links absolutos.</td></tr>
+              <tr><td><code>DEV_MODE</code></td><td><code>0</code> (Prod) / <code>1</code> (Dev)</td><td>Se ativado, ignora headers Authentik e usa o usuário mock.</td></tr>
+              <tr><td><code>DEV_USER_EMAIL</code></td><td><code>dev@c-innovation.com.br</code></td><td>Email do usuário simulado em ambiente local.</td></tr>
+              <tr><td><code>DEV_USER_ROLE</code></td><td><code>admin</code></td><td>Papel padrão do usuário em ambiente de desenvolvimento.</td></tr>
+              <tr><td><code>TZ</code></td><td><code>America/Sao_Paulo</code></td><td>Timezone da aplicação e dos registros de data/hora.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section: Configuração Apache -->
+      <section id="config-apache" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-server"></i> 11. Configuração do Apache Reverse Proxy</h2>
+        <p>
+          O Apache faz o roteamento das requisições direcionadas para <code>/bbs/</code> diretamente até o container da aplicação na porta <code>18010</code>.
+        </p>
+
+        <div class="callout callout-danger">
+          <div class="callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="callout-content">
+            <strong>Ordem Crítica no VirtualHost:</strong>
+            <p>O bloco de configuração <code>&lt;Location "/bbs/"&gt;</code> <strong>DEVE</strong> ser inserido dentro de <code>&lt;VirtualHost *:443&gt;</code> <strong>ANTES</strong> da diretiva genérica <code>ProxyPass /</code> do Authentik Outpost, caso contrário as requisições cairão no outpost e retornarão <strong>Erro 404</strong>.</p>
+          </div>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span class="lang-tag"><i class="fa-solid fa-file-lines"></i> /etc/apache2/sites-available/hub.c-innovation.com.br.conf</span>
+            <button class="btn-copy" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copiar</button>
+          </div>
+          <pre><code># Força barra final: /bbs -> /bbs/ (evita quebra de links relativos)
+RewriteRule ^/bbs$ /bbs/ [R=301,L]
+
+<Location "/bbs/">
+    ProxyPass        "http://127.0.0.1:18010/"
+    ProxyPassReverse "http://127.0.0.1:18010/"
+    ProxyPreserveHost On
+
+    RequestHeader set X-Forwarded-Proto  "https"
+    RequestHeader set X-Forwarded-Prefix "/bbs"
+
+    # Passa adiante os headers que o Authentik injeta:
+    # X-Authentik-Username, X-Authentik-Email, X-Authentik-Name, X-Authentik-Groups
+</Location></code></pre>
+        </div>
+
+        <p>Após a edição, valide e recarregue a configuração do Apache:</p>
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span class="lang-tag"><i class="fa-solid fa-terminal"></i> Bash</span>
+            <button class="btn-copy" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copiar</button>
+          </div>
+          <pre><code>sudo apache2ctl configtest && sudo systemctl reload apache2</code></pre>
+        </div>
+      </section>
+
+      <!-- Section: Importação XLSX -->
+      <section id="importacao-xlsx" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-file-excel"></i> 12. Importação do Histórico da Planilha Excel</h2>
+        <p>
+          A aplicação inclui um script de importação automatizado (<code>import_xlsx.py</code>) capaz de migrar todo o histórico acumulado na planilha original para o PostgreSQL com integridade referencial.
+        </p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span class="lang-tag"><i class="fa-solid fa-terminal"></i> Comando de Importação no Container</span>
+            <button class="btn-copy" onclick="copyCode(this)"><i class="fa-solid fa-copy"></i> Copiar</button>
+          </div>
+          <pre><code># 1. Copie o arquivo Excel para dentro do container:
+docker cp Indice_BBS_por_Embarcacao_v10_ATUALIZADA.xlsx indicebbs_app:/tmp/bbs.xlsx
+
+# 2. Execute o importador dentro do container:
+docker exec -it indicebbs_app python import_xlsx.py /tmp/bbs.xlsx</code></pre>
+        </div>
+
+        <div class="callout callout-success">
+          <div class="callout-icon"><i class="fa-solid fa-check-double"></i></div>
+          <div class="callout-content">
+            <strong>Tratamento de Dados no Importador:</strong>
+            <p>O script processa automaticamente as abas mensais, identifica as embarcações e ROVs pelo mapeamento da aba <code>Cadastro_ROV</code>, faz o parsing das contagens de Não Conformes e falhas C1 a C4-Elo, e insere os registros vinculados ao usuário do sistema.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Troubleshooting -->
+      <section id="troubleshooting" class="doc-section">
+        <h2 class="section-title"><i class="fa-solid fa-wrench"></i> 13. Troubleshooting & Diagnóstico</h2>
+
+        <div class="accordion-item active">
+          <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+            <span><i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Erro 404 ao clicar no ícone do aplicativo no Authentik Launcher</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-body">
+            <p><strong>Causas Frequentes:</strong></p>
+            <ol style="margin-left: 1.5rem; color: var(--text-secondary);">
+              <li><strong>Ordem no Apache:</strong> O bloco <code>&lt;Location "/bbs/"&gt;</code> foi colocado após o <code>ProxyPass /</code> no vhost.</li>
+              <li><strong>Barra Final no Target:</strong> A diretiva <code>ProxyPass "http://127.0.0.1:18010/"</code> está sem a barra final (<code>/</code>), impedindo que o Apache remova o prefixo <code>/bbs</code> ao encaminhar a requisição ao FastAPI.</li>
+              <li><strong>External Host no Authentik:</strong> O campo <em>External Host</em> no Proxy Provider foi configurado sem <code>/bbs</code> no final.</li>
+            </ol>
+            <div class="code-wrapper" style="margin-top: 1rem;">
+              <div class="code-header"><span class="lang-tag">Comandos de Diagnóstico</span></div>
+              <pre><code># 1. Testar se o container responde localmente:
+curl -sI http://127.0.0.1:18010/health
+
+# 2. Verificar regras do Apache:
+sudo grep -n -E 'ProxyPass|Location' /etc/apache2/sites-available/hub.c-innovation.com.br.conf</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+            <span><i class="fa-solid fa-circle-exclamation" style="color: var(--warning);"></i> Erro 401 Unauthorized ou tela "Autenticação Necessária"</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-body">
+            <p>Ocorre quando a requisição chega ao container sem o header <code>X-Authentik-Email</code> (ex: acesso direto pela porta ou fora do fluxo de SSO) com <code>DEV_MODE=0</code>.</p>
+            <p><strong>Solução:</strong> Acesse sempre através da URL protegida <code>https://hub.c-innovation.com.br/bbs/</code> após login no Hub.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
+            <span><i class="fa-solid fa-circle-exclamation" style="color: var(--info);"></i> Erro 403 Forbidden ("Permissão Insuficiente")</span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="accordion-body">
+            <p>Ocorre quando um usuário com papel <code>Viewer</code> tenta acessar formulários de criação/edição de lançamentos (exige <code>Editor</code>) ou o painel administrativo (exige <code>Admin</code>).</p>
+            <p><strong>Solução:</strong> Um administrador deve acessar <code>/admin/users</code> e ajustar a função do usuário ou inseri-lo nos grupos corporativos correspondentes no Authentik.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="doc-footer">
+        <div>
+          <strong>Índice BBS por Embarcação</strong> — C-Innovation do Brasil &copy; 2026. Todos os direitos reservados.
+        </div>
+        <div>
+          Documentação gerada em conformidade com as diretrizes de TI & SMS.
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- JavaScript for Interactive Documentation -->
+  <script>
+    // Theme Toggle
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const htmlEl = document.documentElement;
+
+    themeToggleBtn.addEventListener('click', () => {
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      htmlEl.setAttribute('data-theme', newTheme);
+      themeToggleBtn.innerHTML = newTheme === 'dark' 
+        ? '<i class="fa-solid fa-moon"></i>' 
+        : '<i class="fa-solid fa-sun"></i>';
+      localStorage.setItem('doc-theme', newTheme);
+    });
+
+    // Restore Saved Theme
+    const savedTheme = localStorage.getItem('doc-theme');
+    if (savedTheme) {
+      htmlEl.setAttribute('data-theme', savedTheme);
+      themeToggleBtn.innerHTML = savedTheme === 'dark' 
+        ? '<i class="fa-solid fa-moon"></i>' 
+        : '<i class="fa-solid fa-sun"></i>';
+    }
+
+    // Mobile Sidebar Toggle
+    const toggleSidebarBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+      });
+    }
+
+    // Copy Code Functionality
+    function copyCode(button) {
+      const wrapper = button.closest('.code-wrapper');
+      const pre = wrapper.querySelector('pre');
+      const code = pre.innerText;
+
+      navigator.clipboard.writeText(code).then(() => {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fa-solid fa-check" style="color: var(--success);"></i> Copiado!';
+        button.style.borderColor = 'var(--success)';
+        setTimeout(() => {
+          button.innerHTML = originalHTML;
+          button.style.borderColor = '';
+        }, 2000);
+      });
+    }
+
+    // Quick Search in Documentation
+    const searchInput = document.getElementById('docSearch');
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const sections = document.querySelectorAll('.doc-section');
+      
+      sections.forEach(sec => {
+        const text = sec.innerText.toLowerCase();
+        if (query === '' || text.includes(query)) {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    });
+
+    // ScrollSpy for Active Sidebar Link
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.doc-section');
+      const scrollPos = window.scrollY + 100;
+
+      sections.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        const id = section.getAttribute('id');
+
+        if (scrollPos >= top && scrollPos < top + height) {
+          document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${id}`) {
+              link.classList.add('active');
+            }
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
