@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://indicebbs:indicebbs@db:5432/indicebbs"
-    BASE_URL: str = "https://hub.c-innovation.com.br/bbs"
+    BASE_URL: str = "https://teste/bbs"
     ROOT_PATH: str = "/bbs"
     SECRET_KEY: str = "change-me"
 

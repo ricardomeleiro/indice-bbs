@@ -22,7 +22,7 @@ services:
     container_name: indicebbs_app
     environment:
       DATABASE_URL: postgresql://indicebbs:${POSTGRES_PASSWORD:-indicebbs_pass_2026}@db:5432/indicebbs
-      BASE_URL: https://hub.c-innovation.com.br/bbs
+      BASE_URL: https://teste/bbs
       ROOT_PATH: /bbs
       SECRET_KEY: ${SECRET_KEY:-chave_secreta_longa_bbs_c_innovation}
       TZ: America/Sao_Paulo
