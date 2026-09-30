@@ -1,16 +1,15 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, joinedload
 
 from database import get_db
 from dependencies import require_login, require_editor, add_audit
 from models import MonthlyEntry, Rov, Vessel, User
 from services.kpi import MONTH_FULL_PT
+from templating import templates
 
 router = APIRouter(prefix="/entries")
-templates = Jinja2Templates(directory="templates")
 
 
 def _client_ip(request: Request) -> str:

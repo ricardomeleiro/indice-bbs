@@ -55,7 +55,7 @@
       <div class="d-flex align-items-center gap-3">
         <span class="text-white-50 small">
           <i class="bi bi-person-circle me-1"></i>{{ current_user.name }}
-          <span class="badge bg-light text-dark ms-1">{{ ROLE_LABELS[current_user.role] }}</span>
+          <span class="badge bg-light text-dark ms-1">{{ (ROLE_LABELS.get(current_user.role, current_user.role) if ROLE_LABELS is defined else current_user.role) }}</span>
         </span>
       </div>
       {% endif %}

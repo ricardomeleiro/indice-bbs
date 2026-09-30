@@ -1,9 +1,7 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-
 from database import get_db
 from dependencies import require_login
 from models import User, MonthlyEntry, Vessel
@@ -11,9 +9,9 @@ from services.kpi import (
     rollup_by_vessel_month, maturity_for, target_for, MONTH_FULL_PT,
 )
 from models import META_BY_MATURITY
+from templating import templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
 
 
 def _available_years(db: Session, current_year: int) -> list[int]:

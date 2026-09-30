@@ -1,7 +1,6 @@
 from datetime import datetime
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -14,9 +13,9 @@ from services.kpi import (
     evolution_by_vessel, fleet_evolution, rollup_by_vessel_year, rollup_by_vessel_month,
     contractor_rollup, target_for, MONTH_LABELS_PT, MONTH_FULL_PT,
 )
+from templating import templates
 
 router = APIRouter(prefix="/reports")
-templates = Jinja2Templates(directory="templates")
 
 
 def _years(db: Session, current: int) -> list[int]:

@@ -58,6 +58,7 @@ app/
   services/
     auth.py              — gerencia o usuário padrão e permissões
     kpi.py               — agregações (rollup por embarcação/mês/ano)
+  templating.py          — Jinja2Templates centralizado e variáveis globais
   static/css/custom.css
   templates/             — Jinja2 + Bootstrap 5
 deployment/

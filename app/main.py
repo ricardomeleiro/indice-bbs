@@ -1,14 +1,12 @@
 from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse, PlainTextResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from config import settings
 from database import get_db
 from dependencies import get_current_user_optional
-from models import Role, ROLE_LABELS
-from services.kpi import MONTH_LABELS_PT, MONTH_FULL_PT
+from templating import templates
 from routers import entries, dashboard, reports, admin, exports
 
 
@@ -20,21 +18,6 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-templates = Jinja2Templates(directory="templates")
-
-
-def _template_globals():
-    return {
-        "MONTH_LABELS_PT": MONTH_LABELS_PT,
-        "MONTH_FULL_PT": MONTH_FULL_PT,
-        "ROLE_LABELS": ROLE_LABELS,
-        "Role": Role,
-    }
-
-
-for k, v in _template_globals().items():
-    templates.env.globals[k] = v
 
 
 app.include_router(dashboard.router)
