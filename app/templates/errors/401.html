@@ -3,7 +3,7 @@
 {% block content %}
 <div class="text-center py-5">
   <h1 class="display-6">Autenticação necessária</h1>
-  <p class="text-muted">Faça login pelo Hub para acessar o Índice BBS.</p>
-  <a class="btn btn-primary" href="https://hub.c-innovation.com.br/">Ir para o Hub</a>
+  <p class="text-muted">Acesso restrito ao sistema.</p>
+  <a class="btn btn-primary" href="{{ request.url_for('dashboard_view') }}">Ir para o Dashboard</a>
 </div>
 {% endblock %}

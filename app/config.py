@@ -7,18 +7,9 @@ class Settings(BaseSettings):
     ROOT_PATH: str = "/bbs"
     SECRET_KEY: str = "change-me"
 
-    AUTHENTIK_HEADER_EMAIL: str = "x-authentik-email"
-    AUTHENTIK_HEADER_USERNAME: str = "x-authentik-username"
-    AUTHENTIK_HEADER_NAME: str = "x-authentik-name"
-    AUTHENTIK_HEADER_GROUPS: str = "x-authentik-groups"
-
-    BBS_ADMIN_GROUP: str = "bbs-admin"
-    BBS_EDITOR_GROUP: str = "bbs-editor"
-
-    DEV_MODE: int = 0
-    DEV_USER_EMAIL: str = "dev@c-innovation.com.br"
-    DEV_USER_NAME: str = "Dev User"
-    DEV_USER_ROLE: str = "admin"
+    DEFAULT_USER_EMAIL: str = "admin@c-innovation.com.br"
+    DEFAULT_USER_NAME: str = "Administrador"
+    DEFAULT_USER_ROLE: str = "admin"
 
     TZ: str = "America/Sao_Paulo"
 

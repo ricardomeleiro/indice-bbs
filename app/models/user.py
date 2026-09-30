@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import Column, Integer, String, Boolean, Enum, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Boolean, Enum, DateTime
 from sqlalchemy.sql import func
 from database import Base
 
@@ -25,7 +25,6 @@ class User(Base):
     username = Column(String(200))
     name = Column(String(200), nullable=False)
     role = Column(Enum(Role), default=Role.VIEWER, nullable=False)
-    authentik_groups = Column(JSON, default=list)
     is_active = Column(Boolean, default=True)
     last_login_at = Column(DateTime)
     created_at = Column(DateTime, default=func.now())

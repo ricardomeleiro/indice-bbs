@@ -4,17 +4,14 @@
 
 <h4 class="mb-3">Usuários</h4>
 <p class="text-muted small">
-  Usuários são criados automaticamente na primeira autenticação via Hub Authentik.
-  Papéis padrão são atribuídos pelos grupos <code>bbs-admin</code> e <code>bbs-editor</code>,
-  mas você pode sobrescrever aqui — a menos que o usuário seja atualmente admin,
-  a próxima autenticação recalcula o papel a partir dos grupos.
+  Gerenciamento de usuários cadastrados e seus níveis de acesso (Papel) no sistema.
 </p>
 
 <div class="card">
   <div class="table-responsive">
     <table class="table table-vessel mb-0">
       <thead class="table-light">
-        <tr><th>Nome</th><th>E-mail</th><th>Grupos Authentik</th><th>Último login</th>
+        <tr><th>Nome</th><th>E-mail</th><th>Último login</th>
           <th>Papel</th><th class="text-center">Ativo</th><th></th></tr>
       </thead>
       <tbody>
@@ -23,9 +20,6 @@
           <form method="post" action="{{ request.url_for('admin_users_update', user_id=u.id) }}">
             <td class="fw-semibold">{{ u.name }}</td>
             <td>{{ u.email }}</td>
-            <td class="small">
-              {% for g in (u.authentik_groups or []) %}<span class="badge bg-secondary me-1">{{ g }}</span>{% endfor %}
-            </td>
             <td class="small">{{ u.last_login_at.strftime('%Y-%m-%d %H:%M') if u.last_login_at else '—' }}</td>
             <td>
               <select class="form-select form-select-sm" name="role">

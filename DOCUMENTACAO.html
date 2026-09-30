@@ -854,7 +854,7 @@
           <div class="callout-icon"><i class="fa-solid fa-circle-info"></i></div>
           <div class="callout-content">
             <strong>Publicação Oficial:</strong>
-            <p>O sistema está disponível em ambiente de produção através da URL <code>https://hub.c-innovation.com.br/bbs/</code>, integrado ao ecossistema do Authentik SSO sob o subpath <code>/bbs</code>.</p>
+            <p>O sistema está disponível em ambiente de produção através da URL <code>https://hub.c-innovation.com.br/bbs/</code> sob o subpath <code>/bbs</code>.</p>
           </div>
         </div>
       </section>
@@ -876,12 +876,6 @@
               <i class="fa-solid fa-globe"></i>
               <div class="title">Navegador</div>
               <div class="subtitle">Usuário C-Innovation</div>
-            </div>
-            <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-            <div class="flow-node highlight">
-              <i class="fa-solid fa-shield-halved"></i>
-              <div class="title">Authentik SSO</div>
-              <div class="subtitle">Forward-Auth Proxy</div>
             </div>
             <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
             <div class="flow-node">
@@ -954,9 +948,9 @@
               </tr>
               <tr>
                 <td><strong>Autenticação</strong></td>
-                <td>Authentik</td>
-                <td>Forward-Auth Headers</td>
-                <td>Single Sign-On (SSO) corporativo com leitura de grupos e papéis.</td>
+                <td>Controle Local</td>
+                <td>Usuário do Sistema</td>
+                <td>Gerenciamento interno de usuários e controle de acesso por papéis (RBAC).</td>
               </tr>
               <tr>
                 <td><strong>Conteinerização</strong></td>
@@ -969,43 +963,38 @@
         </div>
       </section>
 
-      <!-- Section: Autenticação & SSO -->
+      <!-- Section: Autenticação & Usuários -->
       <section id="fluxo-autenticacao" class="doc-section">
         <h2 class="section-title"><i class="fa-solid fa-shield-halved"></i> 3. Autenticação, Autorização & Segurança</h2>
         <p>
-          A aplicação opera 100% integrada ao <strong>Authentik SSO</strong> do Hub C-Innovation via cabeçalhos HTTP confiáveis injetados pelo <em>Embedded Outpost</em> (Forward-Auth).
+          A aplicação opera com gestão interna de usuários e controle de acesso baseado em papéis (RBAC). O usuário padrão do sistema é provisionado automaticamente com base nas configurações de ambiente.
         </p>
 
-        <h3 class="doc-subtitle"><i class="fa-solid fa-address-card"></i> Headers HTTP de Autenticação</h3>
+        <h3 class="doc-subtitle"><i class="fa-solid fa-address-card"></i> Configuração de Usuário do Sistema</h3>
         <div class="table-container">
           <table>
             <thead>
               <tr>
-                <th>Header HTTP</th>
-                <th>Exemplo</th>
-                <th>Uso na Aplicação (<code>auth_headers.py</code>)</th>
+                <th>Variável de Ambiente</th>
+                <th>Valor Padrão</th>
+                <th>Descrição (<code>auth.py</code>)</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><code>X-Authentik-Email</code></td>
-                <td><code>ricardo.meleiro@c-innovation.com.br</code></td>
-                <td>Identificador primário único do usuário; aciona o upsert automático na tabela <code>users</code>.</td>
+                <td><code>DEFAULT_USER_EMAIL</code></td>
+                <td><code>admin@c-innovation.com.br</code></td>
+                <td>E-mail do usuário padrão; aciona o upsert automático na tabela <code>users</code>.</td>
               </tr>
               <tr>
-                <td><code>X-Authentik-Username</code></td>
-                <td><code>ricardo.meleiro</code></td>
-                <td>Login do usuário no diretório corporativo.</td>
+                <td><code>DEFAULT_USER_NAME</code></td>
+                <td><code>Administrador</code></td>
+                <td>Nome de exibição exibido no topo da navbar e registros de auditoria.</td>
               </tr>
               <tr>
-                <td><code>X-Authentik-Name</code></td>
-                <td><code>Ricardo Meleiro</code></td>
-                <td>Nome de exibição exibido no topo da navbar.</td>
-              </tr>
-              <tr>
-                <td><code>X-Authentik-Groups</code></td>
-                <td><code>perfil-ti-admin, bbs-editor</code></td>
-                <td>Lista de grupos separados por vírgula para mapeamento dinâmico de papéis.</td>
+                <td><code>DEFAULT_USER_ROLE</code></td>
+                <td><code>admin</code></td>
+                <td>Papel padrão de inicialização (<code>admin</code>, <code>editor</code> ou <code>viewer</code>).</td>
               </tr>
             </tbody>
           </table>
@@ -1016,28 +1005,28 @@
           <div class="card">
             <div class="card-icon" style="color: var(--accent-primary);"><i class="fa-solid fa-eye"></i></div>
             <div class="card-title">Viewer</div>
-            <div class="badge badge-primary" style="margin-bottom: 0.5rem;">Padrão</div>
+            <div class="badge badge-primary" style="margin-bottom: 0.5rem;">Visualização</div>
             <p class="card-desc">Visualiza Dashboard, relatórios de evolução, Pareto, ranking, heatmap e exporta dados em CSV.</p>
           </div>
           <div class="card">
             <div class="card-icon" style="color: var(--warning);"><i class="fa-solid fa-pen-nib"></i></div>
             <div class="card-title">Editor</div>
-            <div class="badge badge-warning" style="margin-bottom: 0.5rem;">Grupos: perfil-gerente, analista</div>
+            <div class="badge badge-warning" style="margin-bottom: 0.5rem;">Operação</div>
             <p class="card-desc">Permissões de Viewer + criar, atualizar e excluir lançamentos mensais de ROVs.</p>
           </div>
           <div class="card">
             <div class="card-icon" style="color: var(--danger);"><i class="fa-solid fa-user-gear"></i></div>
             <div class="card-title">Admin</div>
-            <div class="badge badge-danger" style="margin-bottom: 0.5rem;">Grupos: perfil-ti-admin, diretor</div>
-            <p class="card-desc">Acesso total: gerenciar embarcações, definir maturidade anual, promover usuários e inspecionar auditoria.</p>
+            <div class="badge badge-danger" style="margin-bottom: 0.5rem;">Administração</div>
+            <p class="card-desc">Acesso total: gerenciar embarcações, definir maturidade anual, gerenciar usuários e inspecionar auditoria.</p>
           </div>
         </div>
 
-        <div class="callout callout-warning">
-          <div class="callout-icon"><i class="fa-solid fa-lock"></i></div>
+        <div class="callout callout-info">
+          <div class="callout-icon"><i class="fa-solid fa-user-gear"></i></div>
           <div class="callout-content">
-            <strong>Proteção contra Lockout de Administradores:</strong>
-            <p>Se um usuário for promovido manualmente a <code>Admin</code> através da interface em <code>/admin/users</code>, sua função é fixada no banco de dados e não será rebaixada mesmo que o usuário seja removido dos grupos do Authentik.</p>
+            <strong>Gerenciamento em /admin/users:</strong>
+            <p>Administradores podem gerenciar usuários cadastrados, ativar/desativar contas e alterar papéis diretamente através do painel administrativo.</p>
           </div>
         </div>
       </section>
@@ -1266,8 +1255,8 @@
                 <tbody>
                   <tr>
                     <td><code>users</code></td>
-                    <td>Controle de usuários e permissões sincronizados via SSO.</td>
-                    <td><code>id</code>, <code>email</code>, <code>username</code>, <code>name</code>, <code>role (viewer|editor|admin)</code>, <code>authentik_groups</code>, <code>last_login_at</code></td>
+                    <td>Controle de usuários e permissões do sistema.</td>
+                    <td><code>id</code>, <code>email</code>, <code>username</code>, <code>name</code>, <code>role (viewer|editor|admin)</code>, <code>last_login_at</code></td>
                   </tr>
                   <tr>
                     <td><code>vessel_maturities</code></td>
@@ -1427,10 +1416,8 @@ cd "G:\Meu Drive\Claude\Indice-BBS"
 # 2. Copie o arquivo de variáveis de ambiente
 cp .env.example .env
 
-# 3. Configure as seguintes variáveis no .env:
-# DEV_MODE=1
-# DEV_USER_EMAIL=dev@c-innovation.com.br
-# DEV_USER_ROLE=admin
+# 3. Configure as variáveis desejadas no .env (opcional, já possui valores padrão)
+# DEFAULT_USER_ROLE=admin
 
 # 4. Inicie os containers com build
 docker compose up --build
@@ -1451,7 +1438,6 @@ docker compose up --build
 cd /home/ubuntu/indice-bbs
 
 # 2. Garanta que o .env de produção esteja configurado:
-# DEV_MODE=0
 # POSTGRES_PASSWORD=senha_forte_gerada
 
 # 3. Suba os containers em segundo plano:
@@ -1479,9 +1465,9 @@ curl -sI http://127.0.0.1:18010/health   # Deve retornar HTTP 200 "ok"</code></p
               <tr><td><code>DATABASE_URL</code></td><td><code>postgresql://...</code></td><td>String de conexão do SQLAlchemy.</td></tr>
               <tr><td><code>ROOT_PATH</code></td><td><code>/bbs</code></td><td>Subpath da aplicação no proxy reverso do Apache.</td></tr>
               <tr><td><code>BASE_URL</code></td><td><code>https://hub.c-innovation.com.br/bbs</code></td><td>URL pública base para montagem de links absolutos.</td></tr>
-              <tr><td><code>DEV_MODE</code></td><td><code>0</code> (Prod) / <code>1</code> (Dev)</td><td>Se ativado, ignora headers Authentik e usa o usuário mock.</td></tr>
-              <tr><td><code>DEV_USER_EMAIL</code></td><td><code>dev@c-innovation.com.br</code></td><td>Email do usuário simulado em ambiente local.</td></tr>
-              <tr><td><code>DEV_USER_ROLE</code></td><td><code>admin</code></td><td>Papel padrão do usuário em ambiente de desenvolvimento.</td></tr>
+              <tr><td><code>DEFAULT_USER_EMAIL</code></td><td><code>admin@c-innovation.com.br</code></td><td>E-mail do usuário padrão do sistema.</td></tr>
+              <tr><td><code>DEFAULT_USER_NAME</code></td><td><code>Administrador</code></td><td>Nome do usuário padrão do sistema.</td></tr>
+              <tr><td><code>DEFAULT_USER_ROLE</code></td><td><code>admin</code></td><td>Papel do usuário padrão (admin, editor ou viewer).</td></tr>
               <tr><td><code>TZ</code></td><td><code>America/Sao_Paulo</code></td><td>Timezone da aplicação e dos registros de data/hora.</td></tr>
             </tbody>
           </table>
@@ -1494,14 +1480,6 @@ curl -sI http://127.0.0.1:18010/health   # Deve retornar HTTP 200 "ok"</code></p
         <p>
           O Apache faz o roteamento das requisições direcionadas para <code>/bbs/</code> diretamente até o container da aplicação na porta <code>18010</code>.
         </p>
-
-        <div class="callout callout-danger">
-          <div class="callout-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-          <div class="callout-content">
-            <strong>Ordem Crítica no VirtualHost:</strong>
-            <p>O bloco de configuração <code>&lt;Location "/bbs/"&gt;</code> <strong>DEVE</strong> ser inserido dentro de <code>&lt;VirtualHost *:443&gt;</code> <strong>ANTES</strong> da diretiva genérica <code>ProxyPass /</code> do Authentik Outpost, caso contrário as requisições cairão no outpost e retornarão <strong>Erro 404</strong>.</p>
-          </div>
-        </div>
 
         <div class="code-wrapper">
           <div class="code-header">
@@ -1518,9 +1496,6 @@ RewriteRule ^/bbs$ /bbs/ [R=301,L]
 
     RequestHeader set X-Forwarded-Proto  "https"
     RequestHeader set X-Forwarded-Prefix "/bbs"
-
-    # Passa adiante os headers que o Authentik injeta:
-    # X-Authentik-Username, X-Authentik-Email, X-Authentik-Name, X-Authentik-Groups
 </Location></code></pre>
         </div>
 
@@ -1568,15 +1543,14 @@ docker exec -it indicebbs_app python import_xlsx.py /tmp/bbs.xlsx</code></pre>
 
         <div class="accordion-item active">
           <div class="accordion-header" onclick="this.parentElement.classList.toggle('active')">
-            <span><i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Erro 404 ao clicar no ícone do aplicativo no Authentik Launcher</span>
+            <span><i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Erro 404 ao acessar /bbs/</span>
             <i class="fa-solid fa-chevron-down"></i>
           </div>
           <div class="accordion-body">
             <p><strong>Causas Frequentes:</strong></p>
             <ol style="margin-left: 1.5rem; color: var(--text-secondary);">
-              <li><strong>Ordem no Apache:</strong> O bloco <code>&lt;Location "/bbs/"&gt;</code> foi colocado após o <code>ProxyPass /</code> no vhost.</li>
-              <li><strong>Barra Final no Target:</strong> A diretiva <code>ProxyPass "http://127.0.0.1:18010/"</code> está sem a barra final (<code>/</code>), impedindo que o Apache remova o prefixo <code>/bbs</code> ao encaminhar a requisição ao FastAPI.</li>
-              <li><strong>External Host no Authentik:</strong> O campo <em>External Host</em> no Proxy Provider foi configurado sem <code>/bbs</code> no final.</li>
+              <li><strong>Barra Final no Target:</strong> A diretiva <code>ProxyPass "http://127.0.0.1:18010/"</code> está sem a barra final (<code>/</code>), impedindo que o Apache repasse a rota correta para o FastAPI.</li>
+              <li><strong>Container Parado:</strong> O container da aplicação não está rodando ou falhou na inicialização.</li>
             </ol>
             <div class="code-wrapper" style="margin-top: 1rem;">
               <div class="code-header"><span class="lang-tag">Comandos de Diagnóstico</span></div>
@@ -1595,8 +1569,8 @@ sudo grep -n -E 'ProxyPass|Location' /etc/apache2/sites-available/hub.c-innovati
             <i class="fa-solid fa-chevron-down"></i>
           </div>
           <div class="accordion-body">
-            <p>Ocorre quando a requisição chega ao container sem o header <code>X-Authentik-Email</code> (ex: acesso direto pela porta ou fora do fluxo de SSO) com <code>DEV_MODE=0</code>.</p>
-            <p><strong>Solução:</strong> Acesse sempre através da URL protegida <code>https://hub.c-innovation.com.br/bbs/</code> após login no Hub.</p>
+            <p>Ocorre quando a requisição não possui um usuário ativo associado ou o usuário configurado está inativo.</p>
+            <p><strong>Solução:</strong> Verifique as variáveis <code>DEFAULT_USER_*</code> no <code>.env</code> ou ative o usuário na tela <code>/admin/users</code>.</p>
           </div>
         </div>
 
@@ -1607,7 +1581,7 @@ sudo grep -n -E 'ProxyPass|Location' /etc/apache2/sites-available/hub.c-innovati
           </div>
           <div class="accordion-body">
             <p>Ocorre quando um usuário com papel <code>Viewer</code> tenta acessar formulários de criação/edição de lançamentos (exige <code>Editor</code>) ou o painel administrativo (exige <code>Admin</code>).</p>
-            <p><strong>Solução:</strong> Um administrador deve acessar <code>/admin/users</code> e ajustar a função do usuário ou inseri-lo nos grupos corporativos correspondentes no Authentik.</p>
+            <p><strong>Solução:</strong> Um administrador deve acessar <code>/admin/users</code> e ajustar a função do usuário ou alterar <code>DEFAULT_USER_ROLE</code> no <code>.env</code>.</p>
           </div>
         </div>
       </section>

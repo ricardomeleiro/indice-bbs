@@ -49,7 +49,7 @@ def root(request: Request, db: Session = Depends(get_db)):
     user = get_current_user_optional(request, db)
     if not user:
         return PlainTextResponse(
-            "Autenticação necessária. Acesse via https://hub.c-innovation.com.br/bbs/",
+            "Autenticação necessária.",
             status_code=401,
         )
     return RedirectResponse(request.url_for("dashboard_view"), status_code=302)

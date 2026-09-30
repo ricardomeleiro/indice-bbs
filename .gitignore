@@ -9,3 +9,6 @@ __pycache__/
 # Do not commit real data
 *.xlsx
 *.xls
+
+.vscode/
+

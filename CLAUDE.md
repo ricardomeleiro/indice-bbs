@@ -14,27 +14,20 @@ com dashboard, relatórios e Pareto. Substitui a planilha
 ## Rodando local
 
 ```bash
-cp .env.example .env       # ajuste POSTGRES_PASSWORD e habilite DEV_MODE=1
+cp .env.example .env       # ajuste as variáveis se necessário
 docker compose up --build
-# http://localhost:18010  (fora do Hub — usa DEV_USER_EMAIL do .env)
+# http://localhost:18010
 ```
 
 ## Deploy na EC2 (hub.c-innovation.com.br/bbs)
 
 1. Copie o repo para `/home/ubuntu/indice-bbs/` na EC2 (18.188.46.180)
-2. Copie `.env.example` para `.env`, ajuste senha e SET `DEV_MODE=0`
+2. Copie `.env.example` para `.env` e ajuste as senhas
 3. `docker compose up -d --build`
-4. Configure o Authentik:
-   - **Applications** → New: `Índice BBS`, slug `indice-bbs`
-   - **Providers** → New: **Proxy Provider** modo *Forward auth (single application)*
-   - **External host:** `https://hub.c-innovation.com.br/bbs`
-   - Attach ao Embedded Outpost
-   - (opcional) Crie grupos `bbs-admin` e `bbs-editor`
-5. Edite `/etc/apache2/sites-available/hub.c-innovation.com.br.conf` e adicione
+4. Edite `/etc/apache2/sites-available/hub.c-innovation.com.br.conf` e adicione
    o bloco de [deployment/apache-bbs-subpath.conf](deployment/apache-bbs-subpath.conf)
-   ANTES do `ProxyPass /` existente
-6. `sudo apache2ctl configtest && sudo systemctl reload apache2`
-7. Acesse `https://hub.c-innovation.com.br/bbs/`
+5. `sudo apache2ctl configtest && sudo systemctl reload apache2`
+6. Acesse `https://hub.c-innovation.com.br/bbs/`
 
 ## Importar planilha existente
 
@@ -63,7 +56,7 @@ app/
     admin.py             — /admin/{vessels,maturidade,users,audit}
     exports.py           — /export/entries.csv
   services/
-    auth_headers.py      — resolve o usuário pelos headers X-Authentik-*
+    auth.py              — gerencia o usuário padrão e permissões
     kpi.py               — agregações (rollup por embarcação/mês/ano)
   static/css/custom.css
   templates/             — Jinja2 + Bootstrap 5
@@ -79,10 +72,8 @@ deployment/
 | editor  | Tudo de viewer + inserir/editar/excluir lançamentos |
 | admin   | Tudo + gerenciar embarcações, maturidade SMS, usuários, auditoria |
 
-Papel é atribuído automaticamente a partir dos grupos Authentik configurados em
-`BBS_ADMIN_GROUP` / `BBS_EDITOR_GROUP`. Um admin promovido manualmente pela
-tela **/admin/users** mantém o cargo mesmo se sair dos grupos (proteção contra
-lockout).
+O papel inicial é atribuído a partir de `DEFAULT_USER_ROLE` no `.env` (padrão: `admin`).
+Administradores podem gerenciar e alterar papéis de usuários através da tela **/admin/users**.
 
 ## Meta de KPI
 

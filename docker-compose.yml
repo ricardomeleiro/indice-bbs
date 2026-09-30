@@ -27,16 +27,10 @@ services:
       SECRET_KEY: ${SECRET_KEY:-chave_secreta_longa_bbs_c_innovation}
       TZ: America/Sao_Paulo
       
-      # SSO Authentik
-      AUTHENTIK_HEADER_EMAIL: x-authentik-email
-      AUTHENTIK_HEADER_USERNAME: x-authentik-username
-      AUTHENTIK_HEADER_NAME: x-authentik-name
-      AUTHENTIK_HEADER_GROUPS: x-authentik-groups
-      BBS_ADMIN_GROUP: bbs-admin
-      BBS_EDITOR_GROUP: bbs-editor
-      
-      # Produção
-      DEV_MODE: 0
+      # Usuário padrão
+      DEFAULT_USER_EMAIL: ${DEFAULT_USER_EMAIL:-admin@c-innovation.com.br}
+      DEFAULT_USER_NAME: ${DEFAULT_USER_NAME:-Administrador}
+      DEFAULT_USER_ROLE: ${DEFAULT_USER_ROLE:-admin}
     depends_on:
       db:
         condition: service_healthy

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import User, Role, AuditLog
-from services.auth_headers import resolve_user
+from services.auth import resolve_user
 
 
 def get_current_user_optional(request: Request, db: Session = Depends(get_db)) -> Optional[User]:

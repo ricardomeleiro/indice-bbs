@@ -7,7 +7,7 @@ e heatmap. Substitui a planilha `Indice_BBS_por_Embarcacao_v10_ATUALIZADA.xlsx`.
 ## Publicação
 
 - **URL**: `https://hub.c-innovation.com.br/bbs/`
-- **Modelo**: subpath do Hub Authentik com SSO forward-auth
+- **Modelo**: subpath via Apache reverse proxy
 - **Servidor**: EC2 18.188.46.180 (mesmo host do Hub)
 
 Consulte [CLAUDE.md](CLAUDE.md) para arquitetura, deploy passo a passo, papéis e
